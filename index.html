@@ -1295,11 +1295,11 @@
     </footer>
 
     <script type="module">
-        import PromptHandler from './promptHandler.js';
+        import PromptHandler from './window.promptHandler.js';
 
         // Initialize PromptHandler
         const promptHandler = new PromptHandler();
-        promptHandler.initializeCopyButton();
+        window.promptHandler.initializeCopyButton();
 
         // Function to get element value
         function getElementValue(id, defaultValue = '') {
@@ -1541,7 +1541,7 @@
                 });
 
                 // Translate the prompt using PromptHandler
-                const translatedPrompt = await promptHandler.translateText(promptForTranslation);
+                const translatedPrompt = await window.promptHandler.translateText(promptForTranslation);
 
                 // Restore dialogs in translated prompt
                 let finalTranslatedPrompt = translatedPrompt;
@@ -1889,7 +1889,7 @@
             updateVolumeDisplay('overallVolume', 'overallVolumeValue');
             
             // Initialize dropdown translations
-            await promptHandler.initializeDropdownTranslations();
+            await window.promptHandler.initializeDropdownTranslations();
             
             // Generate initial prompt with scroll
             window.shouldScrollToPrompt = true;
