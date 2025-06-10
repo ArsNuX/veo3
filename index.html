@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VEO 3 PROMPT GENERATOR</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+function savePromptAsTxt(elementId) {
+    const promptText = document.getElementById(elementId).innerText;
+    const blob = new Blob([promptText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'veo3_prompt.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+
+
+function toggleOtherInput(selectElement, inputId) {
+    const input = document.getElementById(inputId);
+    input.style.display = selectElement.value === 'lainnya' ? 'block' : 'none';
+}
+
+function getInputValueWithOther(selectId, otherId) {
+    const selectValue = document.getElementById(selectId).value;
+    if (selectValue === 'lainnya') {
+        return document.getElementById(otherId).value.trim();
+    }
+    return selectValue;
+}
+</script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Chosen Palette: Warm Neutrals with Subtle Emerald Green Accent -->
+<!-- Application Structure Plan: A clean, scrollable single-page form to collect all prompt details, followed by a results section displaying the generated prompts. This linear structure facilitates step-by-step input and direct output access. Key interactions include text input, dropdown selections, and a 'Generate Prompt' button. This design was chosen for its simplicity and directness in achieving the user's goal of prompt generation. -->
+<!-- Visualization & Content Choices: All inputs are standard HTML form elements (textareas, inputs, selects). The output is plain text within pre-formatted blocks, suitable for direct copy-pasting. 'Copy' buttons are provided for convenience. No charts or complex visualizations are used as the primary goal is text prompt generation, not data visualization of a report. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfbf8; /* Light warm neutral background */
+            color: #333;
+        }
+        .container {
+            max-width: 960px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-field, .select-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+        }
+        .textarea-field {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .generate-btn {
+            background-color: #10B981; /* Emerald-500 */
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .generate-btn:hover {
+            background-color: #059669; /* Emerald-600 */
+        }
+        .prompt-block {
+            background-color: #262626; /* Darker slate/neutral */
+            color: #e5e7eb;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            position: relative;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'monospace';
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background-color: #4b5563;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s;
+        }
+        .copy-btn:hover {
+            background-color: #6b7280;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 1.125rem; /* text-lg */
+            margin-bottom: 1rem;
+            color: #4a4a4a;
+        }
+    </style>
+</head>
+<body class="font-inter antialiased">
+<div class="container mx-auto p-4 sm:p-6 lg:p-8">
+<header class="text-center mb-8">
+<h1 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">VEO 3 PROMPT GENERATOR</h1>
+<p class="text-slate-600 text-lg">by Belakang Kelas</p>
+</header>
+<form class="card" id="promptGeneratorForm">
+<h2 class="text-2xl font-bold mb-6 text-center">Isi Detail Scene Anda / Fill Your Scene Details</h2>
+<div class="mb-6">
+<label class="block text-sm font-medium text-slate-700 mb-1" for="judulScene">Judul Scene / Scene Title:</label>
+<input class="input-field" id="judulScene" placeholder="Contoh: Pagi yang Damai di Balkon Kota / Example: Peaceful Morning on City Balcony" type="text"/>
+</div>
+<!-- Character 1 -->
+<h3 class="section-title mt-8 mb-4">Deskripsi Karakter / Character Description</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_usiaJenisKelamin">Usia &amp; Jenis Kelamin / Age &amp; Gender:</label>
+<input class="input-field" id="char_usiaJenisKelamin" placeholder="Contoh: 30-an wanita Kaukasia / Example: 30s Caucasian woman" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_perawakanBentukTubuh">Perawakan/Bentuk Tubuh / Build/Body Type:</label>
+<input class="input-field" id="char_perawakanBentukTubuh" placeholder="Contoh: ramping, tinggi 165cm, berat badan proporsional / Example: slender, 165cm tall, proportional weight" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_rambut">Rambut / Hair:</label>
+<select class="select-field" id="char_rambut" onchange="toggleOtherInput(this, 'char_rambut_other')"><option value="">Pilih Rambut / Select Hair</option><option value="Panjang, lurus">Panjang, lurus</option><option value="Pendek, keriting">Pendek, keriting</option><option value="Cepak, pirang">Cepak, pirang</option><option value="Panjang bergelombang, hitam">Panjang bergelombang, hitam</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="char_rambut_other" placeholder="Masukkan deskripsi rambut..." style="display: none;" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_wajah">Wajah / Face:</label>
+<select class="select-field" id="char_wajah" onchange="toggleOtherInput(this, 'char_wajah_other')"><option value="">Pilih Bentuk Wajah / Select Face</option><option value="Oval, mata besar">Oval, mata besar</option><option value="Kotak, rahang tegas">Kotak, rahang tegas</option><option value="Bulat, pipi tembam">Bulat, pipi tembam</option><option value="Hati, hidung mancung">Hati, hidung mancung</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="char_wajah_other" placeholder="Masukkan deskripsi wajah..." style="display: none;" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_pakaian">Pakaian / Clothing:</label>
+<select class="select-field" id="char_pakaian" onchange="toggleOtherInput(this, 'char_pakaian_other')"><option value="">Pilih Pakaian / Select Clothing</option><option value="Gaun kasual">Gaun kasual</option><option value="Jaket kulit">Jaket kulit</option><option value="Pakaian tradisional">Pakaian tradisional</option><option value="Seragam kantor">Seragam kantor</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="char_pakaian_other" placeholder="Masukkan deskripsi pakaian..." style="display: none;" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_aksesori">Aksesori / Accessories:</label>
+<select class="select-field" id="char_aksesori" onchange="toggleOtherInput(this, 'char_aksesori_other')"><option value="">Pilih Aksesori / Select Accessories</option><option value="Anting">Anting</option><option value="Kacamata">Kacamata</option><option value="Jam tangan">Jam tangan</option><option value="Topi">Topi</option><option value="Tanpa aksesori">Tanpa aksesori</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="char_aksesori_other" placeholder="Masukkan deskripsi aksesori..." style="display: none;" type="text"/>
+</div>
+</div>
+<h3 class="section-title mt-8 mb-4">Detail Suara Karakter / Character Voice Details</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_deskripsiSuara">Deskripsi Suara / Voice Description:</label>
+<select class="select-field" id="char_deskripsiSuara" onchange="toggleOtherInput(this, 'char_deskripsiSuara_other')"><option value="">Pilih Deskripsi Suara / Select Voice Description</option><option value="Lembut dan tenang">Lembut dan tenang</option><option value="Dalam dan berat">Dalam dan berat</option><option value="Ceria dan tinggi">Ceria dan tinggi</option><option value="Netral dan bersih">Netral dan bersih</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="char_deskripsiSuara_other" placeholder="Masukkan deskripsi suara..." style="display: none;" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_nadaSuara">Nada Suara / Voice Tone:</label>
+<select class="select-field" id="char_nadaSuara" onchange="toggleOtherInput(this, 'char_nadaSuara_other')"><option value="">Pilih Nada Suara / Select Voice Tone</option><option value="Soprano">Soprano</option><option value="Mezzo-soprano">Mezzo-soprano</option><option value="Tenor">Tenor</option><option value="Bariton">Bariton</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="char_nadaSuara_other" placeholder="Masukkan nada suara..." style="display: none;" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_timbreSuara">Timbre Suara / Voice Timbre:</label>
+<select class="select-field" id="char_timbreSuara" onchange="toggleOtherInput(this, 'char_timbreSuara_other')"><option value="">Pilih Timbre Suara / Select Voice Timbre</option><option value="Hangat">Hangat</option><option value="Tajam">Tajam</option><option value="Lembut">Lembut</option><option value="Serak">Serak</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="char_timbreSuara_other" placeholder="Masukkan timbre suara..." style="display: none;" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_aksenLogat">Aksen/Logat / Accent/Dialect:</label>
+<select class="select-field" id="char_aksenLogat" onchange="toggleOtherInput(this, 'char_aksenLogat_other')"><option value="">Pilih Aksen / Select Accent</option><option value="Netral">Netral</option><option value="Jawa">Jawa</option><option value="Sunda">Sunda</option><option value="Batak">Batak</option><option value="Padang">Padang</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="char_aksenLogat_other" placeholder="Masukkan aksen atau logat..." style="display: none;" type="text"/>
+</div>
+<div class="md:col-span-2">
+<label class="block text-sm font-medium text-slate-700 mb-1" for="char_caraBerbicara">Cara Berbicara / Speaking Style:</label>
+<select class="select-field" id="char_caraBerbicara" onchange="toggleOtherInput(this, 'char_caraBerbicara_other')"><option value="">Pilih Gaya Bicara / Select Speaking Style</option><option value="Pelan dan jelas">Pelan dan jelas</option><option value="Cepat dan antusias">Cepat dan antusias</option><option value="Santai dan ramah">Santai dan ramah</option><option value="Formal dan tegas">Formal dan tegas</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="char_caraBerbicara_other" placeholder="Masukkan gaya bicara..." style="display: none;" type="text"/>
+</div>
+</div>
+<h3 class="section-title mt-8 mb-4">Aksi &amp; Ekspresi / Action &amp; Expression</h3>
+<div class="mb-4">
+<label class="block text-sm font-medium text-slate-700 mb-1" for="aksiKarakter">Aksi Karakter / Character Action:</label>
+<textarea class="input-field textarea-field" id="aksiKarakter" placeholder="Contoh: Karakter berdiri di balkon sambil Karakter 2 duduk membaca, dan Karakter 3 bermain ponsel / Example: Character stands on balcony, facing city view, holding coffee cup"></textarea>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-slate-700 mb-1" for="ekspresiKarakter">Ekspresi Karakter / Character Expression:</label>
+<select class="select-field" id="ekspresiKarakter" onchange="toggleOtherInput(this, 'ekspresiKarakter_other')"><option value="">Pilih Ekspresi / Select Expression</option><option value="Tenang dan damai">Tenang dan damai</option><option value="Sedih dan murung">Sedih dan murung</option><option value="Marah dan tajam">Marah dan tajam</option><option value="Bahagia dan tersenyum">Bahagia dan tersenyum</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="ekspresiKarakter_other" placeholder="Masukkan ekspresi karakter..." style="display: none;" type="text"/>
+</div>
+<h3 class="section-title mt-8 mb-4">Latar Tempat &amp; Waktu / Setting &amp; Time</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="tempat">Tempat / Place:</label>
+<input class="input-field" id="tempat" placeholder="Contoh: Di balkon luas sebuah apartemen modern di lantai atas / Example: On a spacious balcony of a modern apartment" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="waktu">Waktu / Time:</label>
+<select class="select-field" id="waktu" onchange="toggleOtherInput(this, 'waktu_other')"><option value="">Pilih Waktu / Select Time</option><option value="Pagi hari">Pagi hari</option><option value="Siang">Siang</option><option value="Senja">Senja</option><option value="Malam">Malam</option><option value="Dini hari">Dini hari</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="waktu_other" placeholder="Masukkan waktu kejadian..." style="display: none;" type="text"/>
+</div>
+</div>
+<h3 class="section-title mt-8 mb-4">Detail Visual Tambahan / Additional Visual Details</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="gerakanKamera">Gerakan Kamera / Camera Movement:</label>
+<select class="select-field" id="gerakanKamera" onchange="toggleOtherInput(this, 'gerakanKamera_other')"><option value="">Pilih Gerakan Kamera / Select Camera Movement</option><option value="Static Shot">Static Shot</option><option value="Pan Kiri-Kanan">Pan Kiri-Kanan</option><option value="Dolly In">Dolly In</option><option value="Tracking Shot">Tracking Shot</option><option value="Crane Shot">Crane Shot</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="gerakanKamera_other" placeholder="Masukkan gerakan kamera..." style="display: none;" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="pencahayaan">Pencahayaan / Lighting:</label>
+<select class="select-field" id="pencahayaan">
+<option value="">Pilih Pencahayaan / Select Lighting</option>
+<option value="Cahaya Matahari Pagi">Cahaya Matahari Pagi / Morning Sunlight</option>
+<option value="Cahaya Senja Keemasan">Cahaya Senja Keemasan / Golden Sunset Light</option>
+<option value="Cahaya Malam Kota">Cahaya Malam Kota / City Night Lights</option>
+<option value="Pencahayaan Remang-remang">Pencahayaan Remang-remang / Dim Lighting</option>
+<option value="Pencahayaan Terang">Pencahayaan Terang / Bright Lighting</option>
+<option value="Cahaya Dramatis">Cahaya Dramatis / Dramatic Light</option>
+<option value="Cahaya Neon">Cahaya Neon / Neon Light</option>
+<option value="Cahaya Ethereal/Magis">Cahaya Ethereal/Magis / Ethereal/Magical Light</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="gayaVideoArtStyle">Gaya Video/Art Style / Video/Art Style:</label>
+<select class="select-field" id="gayaVideoArtStyle">
+<option value="">Pilih Gaya Video/Art Style / Select Video/Art Style</option>
+<option value="Sinematik Realistis">Sinematik Realistis / Cinematic Realistic</option>
+<option value="Realistis">Realistis / Realistic</option>
+<option value="Film Noir">Film Noir</option>
+<option value="Animasi 3D">Animasi 3D / 3D Animation</option>
+<option value="Lukisan Cat Air Bergerak">Lukisan Cat Air Bergerak / Moving Watercolor Painting</option>
+<option value="Gaya Dokumenter">Gaya Dokumenter / Documentary Style</option>
+<option value="Gaya Sci-Fi">Gaya Sci-Fi / Sci-Fi Style</option>
+<option value="Gaya Fantasi">Gaya Fantasi / Fantasy Style</option>
+<option value="Gaya Vintage / Retro">Gaya Vintage / Retro / Vintage / Retro Style</option>
+<option value="Gaya Anime">Gaya Anime / Anime Style</option>
+<option value="Gaya Kartun">Gaya Kartun / Cartoon Style</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1" for="kualitasVisual">Kualitas Visual / Visual Quality:</label>
+<select class="select-field" id="kualitasVisual">
+<option value="">Pilih Kualitas Visual / Select Visual Quality</option>
+<option value="Kualitas Tinggi">Kualitas Tinggi / High Quality</option>
+<option value="Resolusi 4K">Resolusi 4K / 4K Resolution</option>
+<option value="Sangat Detail">Sangat Detail / Highly Detailed</option>
+<option value="Gambar Jernih">Gambar Jernih / Clear Image</option>
+<option value="Warna Cerah">Warna Cerah / Bright Colors</option>
+<option value="Film Look">Film Look</option>
+<option value="Estetika Minimalis">Estetika Minimalis / Minimalist Aesthetic</option>
+<option value="Gambar Tajam">Gambar Tajam / Sharp Image</option>
+<option value="Warna Gelap &amp; Moody">Warna Gelap &amp; Moody / Dark &amp; Moody Colors</option>
+</select>
+</div>
+<div class="md:col-span-2">
+<label class="block text-sm font-medium text-slate-700 mb-1" for="sudutKamera">Sudut Kamera / Camera Angle:</label>
+<select class="select-field" id="sudutKamera">
+<option value="">Pilih Sudut Kamera / Select Camera Angle</option>
+<option value="Eye-level Shot">Eye-level Shot</option>
+<option value="Low-angle Shot">Low-angle Shot</option>
+<option value="High-angle Shot">High-angle Shot</option>
+<option value="Medium Shot">Medium Shot</option>
+<option value="Close-up">Close-up</option>
+<option value="Extreme Close-up">Extreme Close-up</option>
+<option value="Wide Shot">Wide Shot</option>
+<option value="Long Shot">Long Shot</option>
+<option value="Over-the-Shoulder Shot">Over-the-Shoulder Shot</option>
+</select>
+</div>
+</div>
+<h3 class="section-title mt-8 mb-4">Suasana &amp; Suara Lingkungan / Atmosphere &amp; Environmental Sound</h3>
+<div class="mb-4">
+<label class="block text-sm font-medium text-slate-700 mb-1" for="suasanaKeseluruhan">Suasana Keseluruhan / Overall Atmosphere:</label>
+<select class="select-field" id="suasanaKeseluruhan">
+<option value="">Pilih Suasana / Select Atmosphere</option>
+<option value="Damai dan Tenang">Damai dan Tenang / Peaceful and Calm</option>
+<option value="Ramai dan Energik">Ramai dan Energik / Busy and Energetic</option>
+<option value="Misterius dan Menegangkan">Misterius dan Menegangkan / Mysterious and Tense</option>
+<option value="Ceria dan Penuh Harapan">Ceria dan Penuh Harapan / Cheerful and Hopeful</option>
+<option value="Melankolis">Melankolis / Melancholic</option>
+<option value="Dramatis">Dramatis / Dramatic</option>
+<option value="Komedian">Komedian / Comedic</option>
+<option value="Epik">Epik / Epic</option>
+<option value="Suram">Suram / Gloomy</option>
+<option value="Romantis">Romantis / Romantic</option>
+</select>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-slate-700 mb-1" for="suaraLingkungan">Suara Lingkungan (Ambience) / Environmental Sound (Ambience):</label>
+<select class="select-field" id="suaraLingkungan" onchange="toggleOtherInput(this, 'suaraLingkungan_other')"><option value="">Pilih Suara Lingkungan / Select Ambience</option><option value="Kicauan burung">Kicauan burung</option><option value="Suara lalu lintas">Suara lalu lintas</option><option value="Angin berhembus">Angin berhembus</option><option value="Suara ombak">Suara ombak</option><option value="Hening">Hening</option><option value="lainnya">Lainnya...</option></select><input class="input-field mt-2" id="suaraLingkungan_other" placeholder="Masukkan suara lingkungan..." style="display: none;" type="text"/>
+</div>
+<h3 class="section-title mt-8 mb-4">Dialog Karakter / Character Dialogue</h3>
+<div class="mb-4">
+<label class="block text-sm font-medium text-slate-700 mb-1" for="dialogKarakter">Dialog Karakter (dalam Bahasa Indonesia) / Character Dialogue (in Indonesian):</label>
+<textarea class="input-field textarea-field" id="dialogKarakter" placeholder="Contoh: Karakter berkata: 'Halo.' / Example: Character says: 'Halo.'"></textarea>
+</div>
+<div class="text-center mt-8">
+<button class="generate-btn" onclick="generatePrompt()" type="button">Generate Prompt</button>
+</div>
+</form>
+<section class="mt-8 hidden" id="resultsSection">
+<h2 class="text-2xl font-bold text-center mb-6 text-slate-900">Hasil Prompt Anda / Your Prompt Results</h2>
+<div class="grid grid-cols-1 gap-6">
+<div>
+<h3 class="text-lg font-semibold mb-2 text-slate-800">1. Prompt Bahasa Indonesia (Siap Digunakan di Veo 3) / Indonesian Prompt (Ready for Veo 3)</h3>
+<div class="prompt-block">
+<button class="copy-btn" onclick="copyPrompt('prompt-id')">Salin / Copy</button>
+<button class="copy-btn" onclick="savePromptAsTxt('prompt-id')" style="top: 3rem;">Simpan .txt</button>
+<code id="prompt-id"></code>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+        function getInputValue(id) {
+            return document.getElementById(id).value.trim();
+        }
+
+        function getCharacterData() {
+            return {
+                usiaJenisKelamin: getInputValue('char_usiaJenisKelamin'),
+                perawakanBentukTubuh: getInputValue('char_perawakanBentukTubuh'),
+                rambut: getInputValueWithOther('char_rambut', 'char_rambut_other'),
+                wajah: getInputValueWithOther('char_wajah', 'char_wajah_other'),
+                pakaian: getInputValueWithOther('char_pakaian', 'char_pakaian_other'),
+                aksesori: getInputValueWithOther('char_aksesori', 'char_aksesori_other'),
+                deskripsiSuara: getInputValueWithOther('char_deskripsiSuara', 'char_deskripsiSuara_other'),
+                nadaSuara: getInputValueWithOther('char_nadaSuara', 'char_nadaSuara_other'),
+                timbreSuara: getInputValueWithOther('char_timbreSuara', 'char_timbreSuara_other'),
+                aksenLogat: getInputValueWithOther('char_aksenLogat', 'char_aksenLogat_other'),
+                caraBerbicara: getInputValueWithOther('char_caraBerbicara', 'char_caraBerbicara_other')
+            };
+        }
+
+        function generateCharacterPrompt(charData) {
+            if (!charData.usiaJenisKelamin) return ''; // Only generate if character data exists
+
+            return `[DESKRIPSI KARAKTER]
+${charData.usiaJenisKelamin}.
+**Perawakan/Bentuk Tubuh:** ${charData.perawakanBentukTubuh}.
+**Rambut:** ${charData.rambut}.
+**Wajah:** ${charData.wajah}.
+**Pakaian:** ${charData.pakaian}.
+**Aksesori:** ${charData.aksesori}.
+
+[DETAIL SUARA KARAKTER]
+Dia berbicara dengan ${charData.deskripsiSuara}.
+**Nada:** ${charData.nadaSuara}.
+**Timbre:** ${charData.timbreSuara}.
+**Aksen/Logat:** ${charData.aksenLogat}, berbicara murni dalam Bahasa Indonesia.
+**Cara Berbicara:** ${charData.caraBerbicara}.
+**PENTING: Seluruh dialog harus dalam Bahasa Indonesia dengan pengucapan natural dan jelas. Pastikan suara karakter ini konsisten di seluruh video.**
+
+`;
+        }
+
+        function copyPrompt(elementId) {
+            const promptText = document.getElementById(elementId).innerText;
+            const textArea = document.createElement('textarea');
+            textArea.value = promptText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('Prompt berhasil disalin! / Prompt copied successfully!');
+            } catch (err) {
+                alert('Gagal menyalin prompt. / Failed to copy prompt.');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        async function generatePrompt() {
+            const data = {
+                judulScene: getInputValue('judulScene'),
+                aksiKarakter: getInputValue('aksiKarakter'),
+                ekspresiKarakter: getInputValueWithOther('ekspresiKarakter', 'ekspresiKarakter_other'),
+                tempat: getInputValue('tempat'),
+                waktu: getInputValueWithOther('waktu', 'waktu_other'),
+                gerakanKamera: getInputValueWithOther('gerakanKamera', 'gerakanKamera_other'), // Now a text input
+                pencahayaan: getInputValue('pencahayaan'),
+                gayaVideoArtStyle: getInputValue('gayaVideoArtStyle'),
+                kualitasVisual: getInputValue('kualitasVisual'),
+                sudutKamera: getInputValue('sudutKamera'),
+                suasanaKeseluruhan: getInputValue('suasanaKeseluruhan'),
+                suaraLingkungan: getInputValueWithOther('suaraLingkungan', 'suaraLingkungan_other'),
+                dialogKarakter: getInputValue('dialogKarakter')
+            };
+
+            const charData = getCharacterData();
+            let charactersPrompt = generateCharacterPrompt(charData);
+            
+            // Construct Indonesian Prompt
+            const promptId = `[JUDUL SCENE: ${data.judulScene}]
+
+${charactersPrompt}[AKSI KARAKTER]
+${data.aksiKarakter}.
+
+[EKSPRESI KARAKTER]
+${data.ekspresiKarakter}.
+
+[LATAR TEMPAT & WAKTU]
+${data.tempat}.
+**Waktu:** ${data.waktu}.
+
+[DETAIL VISUAL TAMBAHAN]
+**Gerakan Kamera:** ${data.gerakanKamera}.
+**Pencahayaan:** ${data.pencahayaan}.
+**Gaya Video/Art Style:** ${data.gayaVideoArtStyle}.
+**Kualitas Visual:** ${data.kualitasVisual}.
+**Sudut Kamera:** ${data.sudutKamera}.
+
+[SUASANA KESELURUHAN]
+Suasana ${data.suasanaKeseluruhan}.
+
+[SUARA LINGKUNGAN (AMBIENCE)]
+**SOUND:** ${data.suaraLingkungan}.
+
+[DIALOG KARAKTER]
+**DIALOG dalam Bahasa Indonesia:** Karakter berkata: "${data.dialogKarakter}"
+
+[NEGATIVE PROMPT]
+**Hindari:** teks di layar, subtitle, tulisan di video, font, logo, distorsi, artefak, anomali, wajah ganda, anggota badan cacat, tangan tidak normal, orang tambahan, objek mengganggu, kualitas rendah, buram, glitch, suara robotik, suara pecah.`;
+
+            document.getElementById('prompt-id').innerText = promptId;
+            document.getElementById('resultsSection').classList.remove('hidden');
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+    
+function savePromptAsTxt(elementId) {
+    const promptText = document.getElementById(elementId).innerText;
+    const blob = new Blob([promptText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'veo3_prompt.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+</script>
+</body>
+</html>
